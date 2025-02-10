@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback, useMemo } from "react"
-import { usePostHog } from "../providers/posthog"
+
 import debounce from "lodash/debounce"
 import { Settings2, RotateCcw, Save } from "lucide-react"
 import { useToast } from "./ui/use-toast"
@@ -31,7 +31,6 @@ interface SettingsProps {
 export function Settings({ onSettingsChange }: SettingsProps) {
   const [open, setOpen] = useState(false)
   const { toast } = useToast()
-  const posthog = usePostHog()
   
   const form = useForm<SettingsFormValues>({
     defaultValues: {
@@ -66,25 +65,12 @@ export function Settings({ onSettingsChange }: SettingsProps) {
       googleApiToken: data.googleApiToken
     })
 
-    // Track settings update
-    posthog.capture('settings_updated', {
-      model: data.model,
-      has_deepseek_token: !!data.deepseekApiToken,
-      has_google_token: !!data.googleApiToken,
-      has_system_prompt: !!data.systemPrompt,
-      deepseek_headers_count: data.deepseekHeaders.length,
-      deepseek_body_count: data.deepseekBody.length,
-      google_headers_count: data.googleHeaders.length,
-      google_body_count: data.googleBody.length,
-      timestamp: new Date().toISOString()
-    })
-
     toast({
       variant: "success",
       description: "Settings saved to local storage",
       duration: 2000,
     })
-  }, [onSettingsChange, toast, posthog])
+  }, [onSettingsChange, toast])
 
   const debouncedSaveCallback = useMemo(
     () => debounce(debouncedSave, 1000),
@@ -117,11 +103,6 @@ export function Settings({ onSettingsChange }: SettingsProps) {
     onSettingsChange({
       deepseekApiToken: "",
       googleApiToken: ""
-    })
-
-    // Track settings reset
-    posthog.capture('settings_reset', {
-      timestamp: new Date().toISOString()
     })
 
     toast({

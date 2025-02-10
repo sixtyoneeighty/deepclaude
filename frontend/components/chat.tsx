@@ -19,7 +19,7 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter"
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism"
 import { CopyButton } from "@/components/ui/copy-button"
 import { MarkdownEditor } from "@/components/ui/markdown-editor"
-import { usePostHog } from "../providers/posthog"
+
 
 interface Message {
   role: "user" | "assistant"
@@ -44,7 +44,7 @@ interface ChatProps {
 }
 
 export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
-  const posthog = usePostHog()
+
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -212,7 +212,7 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
       })
       setCurrentModel(selectedModel)
     }
-  }, [selectedModel, currentModel, currentChatId, posthog])
+  }, [selectedModel, currentModel, currentChatId])
 
   // Memoized renderers for code blocks
   const renderers = useMemo(() => {
@@ -694,10 +694,6 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
                       setCurrentChatId(chat.id)
                       setMessages(chat.messages)
                       // Track chat selection
-                      posthog.capture('chat_selected', {
-                        chat_id: chat.id,
-                        timestamp: new Date().toISOString()
-                      })
                     }}
                     className="flex-1 text-left"
                   >
@@ -730,9 +726,6 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => {
-                posthog.capture('github_issue_click', {
-                  timestamp: new Date().toISOString()
-                })
               }}
             >
               <Button
