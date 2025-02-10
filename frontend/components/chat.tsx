@@ -115,10 +115,7 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
 
   // Delete a chat
   const deleteChat = (chatId: string) => {
-    posthog.capture('chat_deleted', {
-      chat_id: chatId,
-      timestamp: new Date().toISOString()
-    })
+
     setChats(prev => prev.filter(chat => chat.id !== chatId))
     if (currentChatId === chatId) {
       setCurrentChatId(null)
@@ -129,10 +126,7 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
 
   // Clear all chats
   const clearAllChats = () => {
-    posthog.capture('chats_cleared', {
-      chats_count: chats.length,
-      timestamp: new Date().toISOString()
-    })
+
     setChats([])
     setCurrentChatId(null)
     setMessages([])
@@ -165,10 +159,7 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
     setCurrentChatId(chatId)
     setMessages([])
 
-    posthog.capture('chat_created', {
-      chat_id: chatId,
-      timestamp: new Date().toISOString()
-    })
+
   }
 
   // Update current chat
@@ -204,12 +195,7 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
   // Track model changes
   useEffect(() => {
     if (currentModel !== selectedModel) {
-      posthog.capture('model_changed', {
-        from_model: currentModel,
-        to_model: selectedModel,
-        chat_id: currentChatId,
-        timestamp: new Date().toISOString()
-      })
+
       setCurrentModel(selectedModel)
     }
   }, [selectedModel, currentModel, currentChatId])
@@ -409,14 +395,7 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
     if (!input.trim() || isLoading) return
     if (!apiTokens.deepseekApiToken || !apiTokens.googleApiToken) return
 
-    // Track message sent
-    posthog.capture('message_sent', {
-      chat_id: currentChatId,
-      model: currentModel,
-      message_length: input.length,
-      has_code: input.includes('```'),
-      timestamp: new Date().toISOString()
-    })
+
 
     // Create new chat if none exists
     if (!currentChatId) {
@@ -576,12 +555,7 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
       }
     } catch (error) {
       console.error("Error:", error)
-      // Track error
-      posthog.capture('chat_error', {
-        chat_id: currentChatId,
-        error: error instanceof Error ? error.message : String(error),
-        timestamp: new Date().toISOString()
-      })
+
     } finally {
       setIsLoading(false)
       // Clean up
@@ -765,11 +739,7 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
         onClick={() => {
           const newState = !isSidebarOpen
           setIsSidebarOpen(newState)
-          // Track sidebar toggle
-          posthog.capture('sidebar_toggled', {
-            new_state: newState ? 'open' : 'closed',
-            timestamp: new Date().toISOString()
-          })
+
         }}
         className={`fixed top-4 z-50 p-2 bg-muted/30 hover:bg-muted/50 rounded-lg transition-all duration-300 ease-in-out ${
           isSidebarOpen ? 'left-[268px]' : 'left-4'
