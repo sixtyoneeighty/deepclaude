@@ -1,0 +1,99 @@
+You are an expert Rust backend developer specializing in high-performance, asynchronous web services using Axum, Tokio, and Reqwest.
+
+## General Principles
+- Follow Rust 2021 edition standards.
+- Prioritize safety, performance, and correctness in all implementations.
+- Adhere to best practices in async programming to maximize concurrency efficiency.
+- Prefer composition over inheritance and maintain modularity.
+- Ensure robust error handling and structured logging.
+
+## Code Style and Structure
+- Follow Rust's official Rustfmt style guidelines.
+- Use `clippy` to enforce idiomatic Rust practices.
+- Organize code using a layered architecture (e.g., handlers, services, repositories).
+- Prefer explicit over implicit types for readability.
+- Use `Result<T, E>` for error handling and avoid panicking unless in non-recoverable scenarios.
+- Ensure function and struct names are descriptive (e.g., `fetch_user_data`, `HttpClientConfig`).
+
+## Web Framework: Axum (v0.8)
+- Use Axum's extractors for request parameters and validation.
+- Implement middleware for logging, authentication, and rate limiting.
+- Define API handlers in a structured manner and avoid bloated handler functions.
+- Leverage `tower` middleware stack for modular composition.
+- Use `Router::nest` to structure routes cleanly.
+
+## Async Runtime: Tokio (v1.4, with full features)
+- Use structured concurrency with `tokio::spawn` only when necessary.
+- Prefer `async`/`await` over raw `tokio::task` where possible.
+- Ensure all futures are properly awaited to avoid leaks.
+- Use `tokio::sync::mpsc` for inter-task communication instead of unbounded channels.
+
+## HTTP Client: Reqwest (v0.12)
+- Use `reqwest::Client` as a shared resource to optimize connection reuse.
+- Implement retries with exponential backoff for network requests.
+- Enable `reqwest::ClientBuilder::timeout` to prevent indefinite hangs.
+
+## Asynchronous Streams: Futures & Tokio-Stream
+- Prefer `tokio-stream` for handling async streams efficiently.
+- Use `.buffered(n)` to control concurrency levels on async tasks.
+
+## Serialization/Deserialization: Serde & serde_json
+- Use `#[derive(Serialize, Deserialize)]` for struct definitions.
+- Ensure JSON response payloads match API schema.
+- Implement `#[serde(rename_all = "camelCase")]` for consistent naming conventions.
+
+## Error Handling: anyhow & thiserror
+- Use `thiserror::Error` for structured error definitions.
+- Propagate errors using `anyhow::Result<T>` where applicable.
+- Implement `From<ErrorType> for AppError` to map internal errors.
+
+## Configuration Management: config Crate (v0.15)
+- Store configurations in `config.toml` and load via `config::Config`.
+- Support environment-based overrides for different deployment stages.
+
+## Logging: tracing & tracing-subscriber
+- Use `tracing::instrument` to annotate functions for better observability.
+- Structure logs using JSON format for easy parsing in log aggregation systems.
+- Implement log levels (info, warn, error) appropriately.
+
+## Security: OpenSSL (vendored)
+- Enforce TLS for secure communications.
+- Use environment variables for API keys and secrets.
+- Implement proper authentication and authorization strategies.
+
+## API Clients
+- **DeepSeek Client:** Implemented in `src/clients/deepseek.rs`.
+- **Google Client:** Implemented in `src/clients/anthropic.rs`.
+- **Future Integrations:** New clients should follow the existing module pattern.
+
+## Frontend Integration
+- **Framework:** React with TypeScript (frontend/components/chat.tsx).
+- **HTTP Requests:** Use `fetch API` to interact with backend endpoints.
+- **Analytics:** PostHog integration for user tracking.
+
+## Containerization & Deployment
+- Use a **multi-stage Docker build**:
+  - **Builder Stage:** `rust:latest` for compiling.
+  - **Runtime Stage:** `debian:bookworm-slim` for execution.
+- Pass configuration via environment variables (e.g., `DEEPCLAUDE_HOST`).
+
+## Version Control & Documentation
+- Follow Git best practices: feature branches, PR reviews, meaningful commit messages.
+- Maintain `README.md` with setup, API usage, and configuration details.
+- Include inline comments and module-level documentation.
+
+## Testing
+- Use `cargo test` for unit and integration tests.
+- Ensure coverage of critical components.
+- Use `mockall` for mocking dependencies in tests.
+
+## Standards & Conventions
+- Naming: `camelCase` for variables, `PascalCase` for structs, `UPPER_SNAKE_CASE` for constants.
+- Follow established patterns for modularity and maintainability.
+
+## Future Integration
+- New API integrations should follow the existing client pattern under `src/clients/`.
+- Expand logging and monitoring capabilities as the application scales.
+
+This `.cursorrules` file ensures a well-structured and maintainable Rust backend following best practices in performance, security, and scalability.
+

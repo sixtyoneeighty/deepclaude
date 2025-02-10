@@ -34,7 +34,7 @@ pub struct ServerConfig {
 #[derive(Debug, Deserialize, Serialize, Clone)]
 pub struct PricingConfig {
     pub deepseek: DeepSeekPricing,
-    pub anthropic: AnthropicPricing,
+    pub gemini: GeminiPricing,
 }
 
 /// DeepSeek-specific pricing configuration.
@@ -48,15 +48,13 @@ pub struct DeepSeekPricing {
     pub output_price: f64,            // per million tokens
 }
 
-/// Anthropic-specific pricing configuration.
+/// Gemini-specific pricing configuration.
 ///
-/// Contains pricing information for different Claude model variants
+/// Contains pricing information for different Gemini model variants
 /// and their associated costs.
 #[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct AnthropicPricing {
-    pub claude_3_sonnet: ModelPricing,
-    pub claude_3_haiku: ModelPricing,
-    pub claude_3_opus: ModelPricing,
+pub struct GeminiPricing {
+    pub gemini_pro: ModelPricing,
 }
 
 /// Generic model pricing configuration.
@@ -114,24 +112,12 @@ impl Default for Config {
                     input_cache_miss_price: 0.55,
                     output_price: 2.19,
                 },
-                anthropic: AnthropicPricing {
-                    claude_3_sonnet: ModelPricing {
-                        input_price: 3.0,
-                        output_price: 15.0,
-                        cache_write_price: 3.75,
-                        cache_read_price: 0.30,
-                    },
-                    claude_3_haiku: ModelPricing {
-                        input_price: 0.80,
-                        output_price: 4.0,
-                        cache_write_price: 1.0,
-                        cache_read_price: 0.08,
-                    },
-                    claude_3_opus: ModelPricing {
-                        input_price: 15.0,
-                        output_price: 75.0,
-                        cache_write_price: 18.75,
-                        cache_read_price: 1.50,
+                gemini: GeminiPricing {
+                    gemini_pro: ModelPricing {
+                        input_price: 0.125,  // $0.125 per million tokens
+                        output_price: 0.375, // $0.375 per million tokens
+                        cache_write_price: 0.0,
+                        cache_read_price: 0.0,
                     },
                 },
             },

@@ -39,7 +39,7 @@ Harness the power of DeepSeek R1's reasoning and Claude's creativity and code ge
 
 ## Overview
 
-DeepClaude is a high-performance LLM inference API that combines DeepSeek R1's Chain of Thought (CoT) reasoning capabilities with Anthropic Claude's creative and code generation prowess. It provides a unified interface for leveraging the strengths of both models while maintaining complete control over your API keys and data.
+DeepClaude is a high-performance LLM inference API that combines DeepSeek R1's Chain of Thought (CoT) reasoning capabilities with Google Claude's creative and code generation prowess. It provides a unified interface for leveraging the strengths of both models while maintaining complete control over your API keys and data.
 
 ## Features
 
@@ -72,7 +72,7 @@ However, R1 lacks in code generation, creativity, and conversational skills. Cla
 
 - Rust 1.75 or higher
 - DeepSeek API key
-- Anthropic API key
+- Google API key
 
 ### Installation
 
@@ -113,7 +113,7 @@ response = requests.post(
     "http://127.0.0.1:1337/",
     headers={
         "X-DeepSeek-API-Token": "<YOUR_DEEPSEEK_API_KEY>",
-        "X-Anthropic-API-Token": "<YOUR_ANTHROPIC_API_KEY>"
+        "X-Google-API-Token": "<YOUR_ANTHROPIC_API_KEY>"
     },
     json={
         "messages": [
@@ -139,7 +139,7 @@ async def stream_response():
             "http://127.0.0.1:1337/",
             headers={
                 "X-DeepSeek-API-Token": "<YOUR_DEEPSEEK_API_KEY>",
-                "X-Anthropic-API-Token": "<YOUR_ANTHROPIC_API_KEY>"
+                "X-Google-API-Token": "<YOUR_ANTHROPIC_API_KEY>"
             },
             json={
                 "stream": True,
@@ -220,7 +220,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) f
 DeepClaude is a free and open-source project by [Asterisk](https://asterisk.so/). Special thanks to:
 
 - DeepSeek for their incredible R1 model
-- Anthropic for Claude's capabilities
+- Google for Claude's capabilities
 - The open-source community for their continuous support
 
 ---

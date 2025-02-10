@@ -20,7 +20,7 @@ pub struct ApiResponse {
     pub deepseek_response: Option<ExternalApiResponse>,
     
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub anthropic_response: Option<ExternalApiResponse>,
+    pub gemini_response: Option<ExternalApiResponse>,
     
     pub combined_usage: CombinedUsage,
 }
@@ -50,12 +50,12 @@ pub struct ExternalApiResponse {
 /// Combined usage statistics from both AI models.
 ///
 /// Aggregates token usage and cost information from both
-/// DeepSeek and Anthropic API calls.
+/// DeepSeek and Google API calls.
 #[derive(Debug, Serialize, Clone)]
 pub struct CombinedUsage {
     pub total_cost: String,
     pub deepseek_usage: DeepSeekUsage,
-    pub anthropic_usage: AnthropicUsage,
+    pub gemini_usage: GeminiUsage,
 }
 
 /// Usage statistics for DeepSeek API calls.
@@ -72,16 +72,14 @@ pub struct DeepSeekUsage {
     pub total_cost: String,
 }
 
-/// Usage statistics for Anthropic API calls.
+/// Usage statistics for Gemini API calls.
 ///
 /// Tracks token consumption and costs specific to
-/// Anthropic model usage.
+/// Gemini model usage.
 #[derive(Debug, Serialize, Clone)]
-pub struct AnthropicUsage {
+pub struct GeminiUsage {
     pub input_tokens: u32,
     pub output_tokens: u32,
-    pub cached_write_tokens: u32,
-    pub cached_read_tokens: u32,
     pub total_tokens: u32,
     pub total_cost: String,
 }
@@ -137,16 +135,16 @@ impl ContentBlock {
         }
     }
 
-    /// Converts an Anthropic content block to a generic content block.
+    /// Converts an Google content block to a generic content block.
     ///
     /// # Arguments
     ///
-    /// * `block` - The Anthropic-specific content block to convert
+    /// * `block` - The Google-specific content block to convert
     ///
     /// # Returns
     ///
     /// A new `ContentBlock` with the same content type and text
-    pub fn from_anthropic(block: crate::clients::anthropic::ContentBlock) -> Self {
+    pub fn from_gemini(block: crate::clients::gemini::ContentBlock) -> Self {
         Self {
             content_type: block.content_type,
             text: block.text,
@@ -181,11 +179,9 @@ impl ApiResponse {
                     total_tokens: 0,
                     total_cost: "$0.00".to_string(),
                 },
-                anthropic_usage: AnthropicUsage {
+                gemini_usage: GeminiUsage {
                     input_tokens: 0,
                     output_tokens: 0,
-                    cached_write_tokens: 0,
-                    cached_read_tokens: 0,
                     total_tokens: 0,
                     total_cost: "$0.00".to_string(),
                 },
@@ -194,23 +190,21 @@ impl ApiResponse {
     }
 }
 
-impl AnthropicUsage {
-    /// Converts Anthropic usage statistics to the generic usage format.
+impl GeminiUsage {
+    /// Converts Gemini usage statistics to the generic usage format.
     ///
     /// # Arguments
     ///
-    /// * `usage` - The Anthropic-specific usage statistics to convert
+    /// * `response` - The Gemini response containing usage information
     ///
     /// # Returns
     ///
-    /// A new `AnthropicUsage` with values copied from the Anthropic usage
-    pub fn from_anthropic(usage: crate::clients::anthropic::Usage) -> Self {
+    /// A new `GeminiUsage` with values from the Gemini response
+    pub fn from_gemini(response: &crate::clients::gemini::GeminiResponse) -> Self {
         Self {
-            input_tokens: usage.input_tokens,
-            output_tokens: usage.output_tokens,
-            cached_write_tokens: usage.cache_creation_input_tokens,
-            cached_read_tokens: usage.cache_read_input_tokens,
-            total_tokens: usage.input_tokens + usage.output_tokens,
+            input_tokens: response.usage.as_ref().map(|u| u.prompt_tokens).unwrap_or(0),
+            output_tokens: response.usage.as_ref().map(|u| u.completion_tokens).unwrap_or(0),
+            total_tokens: response.usage.as_ref().map(|u| u.total_tokens).unwrap_or(0),
             total_cost: "$0.00".to_string(), // Cost will be calculated later
         }
     }

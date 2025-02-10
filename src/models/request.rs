@@ -9,7 +9,7 @@ use std::collections::HashMap;
 /// Primary request structure for chat API endpoints.
 ///
 /// This structure represents a complete chat request, including messages,
-/// system prompts, and configuration options for both DeepSeek and Anthropic APIs.
+/// system prompts, and configuration options for both DeepSeek and Google APIs.
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ApiRequest {
     #[serde(default)]

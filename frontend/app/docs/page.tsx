@@ -30,7 +30,7 @@ const examples = {
 -H 'Content-Type: application/json'
 -H 'Accept: application/json'
 -H 'X-DeepSeek-API-Token: <YOUR_DEEPSEEK_API_TOKEN>'
--H 'X-Anthropic-API-Token: <YOUR_ANTHROPIC_API_TOKEN>'
+-H 'X-google-API-Token: <YOUR_google_API_TOKEN>'
 -d '{
   "stream": false,
   "verbose": false,
@@ -48,7 +48,7 @@ const examples = {
       "temperature": 0
     }
   },
-  "anthropic_config": {
+  "google_config": {
     "headers": {
       "Add-Custom-Header-To-Claude-Call": "example"
     },
@@ -79,7 +79,7 @@ const examples = {
       "total_tokens": 509,
       "total_cost": "$0.001"
     },
-    "anthropic_usage": {
+    "google_usage": {
       "input_tokens": 507,
       "output_tokens": 20,
       "cached_write_tokens": 0,
@@ -95,7 +95,7 @@ const examples = {
 -H 'Content-Type: application/json'
 -H 'Accept: application/json'
 -H 'X-DeepSeek-API-Token: <YOUR_DEEPSEEK_API_TOKEN>'
--H 'X-Anthropic-API-Token: <YOUR_ANTHROPIC_API_TOKEN>'
+-H 'X-google-API-Token: <YOUR_google_API_TOKEN>'
 -d '{
   "stream": true,
   "verbose": false,
@@ -113,7 +113,7 @@ const examples = {
       "temperature": 0
     }
   },
-  "anthropic_config": {
+  "google_config": {
     "headers": {
       "Add-Custom-Header-To-Claude-Call": "example"
     },
@@ -306,7 +306,7 @@ data: {"type":"done"}`
 -H 'Content-Type: application/json'
 -H 'Accept: application/json'
 -H 'X-DeepSeek-API-Token: <YOUR_DEEPSEEK_API_TOKEN>'
--H 'X-Anthropic-API-Token: <YOUR_ANTHROPIC_API_TOKEN>'
+-H 'X-google-API-Token: <YOUR_google_API_TOKEN>'
 -d '{
   "stream": false,
   "verbose": true,
@@ -324,7 +324,7 @@ data: {"type":"done"}`
       "temperature": 0
     }
   },
-  "anthropic_config": {
+  "google_config": {
     "headers": {
       "Add-Custom-Header-To-Claude-Call": "example"
     },
@@ -391,29 +391,29 @@ data: {"type":"done"}`
       }
     }
   },
-  "anthropic_response": {
+  "google_response": {
     "status": 200,
     "headers": {
-      "anthropic-ratelimit-input-tokens-reset": "<anthropic-ratelimit-input-tokens-reset>",
-      "anthropic-ratelimit-output-tokens-limit": "<anthropic-ratelimit-output-tokens-limit>",
-      "anthropic-ratelimit-tokens-reset": "<anthropic-ratelimit-tokens-reset>",
+      "google-ratelimit-input-tokens-reset": "<google-ratelimit-input-tokens-reset>",
+      "google-ratelimit-output-tokens-limit": "<google-ratelimit-output-tokens-limit>",
+      "google-ratelimit-tokens-reset": "<google-ratelimit-tokens-reset>",
       "content-type": "<content-type>",
       "via": "<via>",
-      "anthropic-ratelimit-input-tokens-remaining": "<anthropic-ratelimit-input-tokens-remaining>",
-      "anthropic-ratelimit-output-tokens-remaining": "<anthropic-ratelimit-output-tokens-remaining>",
-      "anthropic-ratelimit-input-tokens-limit": "<anthropic-ratelimit-input-tokens-limit>",
-      "anthropic-ratelimit-output-tokens-reset": "<anthropic-ratelimit-output-tokens-reset>",
+      "google-ratelimit-input-tokens-remaining": "<google-ratelimit-input-tokens-remaining>",
+      "google-ratelimit-output-tokens-remaining": "<google-ratelimit-output-tokens-remaining>",
+      "google-ratelimit-input-tokens-limit": "<google-ratelimit-input-tokens-limit>",
+      "google-ratelimit-output-tokens-reset": "<google-ratelimit-output-tokens-reset>",
       "connection": "<connection>",
-      "anthropic-ratelimit-requests-reset": "<anthropic-ratelimit-requests-reset>",
-      "anthropic-ratelimit-requests-limit": "<anthropic-ratelimit-requests-limit>",
-      "anthropic-ratelimit-tokens-limit": "<anthropic-ratelimit-tokens-limit>",
+      "google-ratelimit-requests-reset": "<google-ratelimit-requests-reset>",
+      "google-ratelimit-requests-limit": "<google-ratelimit-requests-limit>",
+      "google-ratelimit-tokens-limit": "<google-ratelimit-tokens-limit>",
       "cf-ray": "<cf-ray>",
       "date": "<date>",
       "server": "<server>",
       "cf-cache-status": "<cf-cache-status>",
       "content-length": "<content-length>",
-      "anthropic-ratelimit-requests-remaining": "<anthropic-ratelimit-requests-remaining>",
-      "anthropic-ratelimit-tokens-remaining": "<anthropic-ratelimit-tokens-remaining>",
+      "google-ratelimit-requests-remaining": "<google-ratelimit-requests-remaining>",
+      "google-ratelimit-tokens-remaining": "<google-ratelimit-tokens-remaining>",
       "request-id": "<request-id>",
       "x-robots-tag": "<x-robots-tag>"
     },
@@ -448,7 +448,7 @@ data: {"type":"done"}`
       "total_tokens": 1441,
       "total_cost": "$0.003"
     },
-    "anthropic_usage": {
+    "google_usage": {
       "input_tokens": 1490,
       "output_tokens": 20,
       "cached_write_tokens": 0,
@@ -598,7 +598,7 @@ export default function DocsPage() {
                 </div>
                 <div>
                   <p className="text-lg mb-4">
-                    The API requires authentication tokens for both DeepSeek and Anthropic services.
+                    The API requires authentication tokens for both DeepSeek and google services.
                     Both tokens must be included in the request headers:
                   </p>
                   <div className="space-y-4">
@@ -607,8 +607,8 @@ export default function DocsPage() {
                       <p className="text-muted-foreground">Your DeepSeek API authentication token</p>
                     </div>
                     <div className="p-4 rounded-lg bg-muted/30">
-                      <p className="font-mono mb-2 text-primary">X-Anthropic-API-Token</p>
-                      <p className="text-muted-foreground">Your Anthropic API authentication token</p>
+                      <p className="font-mono mb-2 text-primary">X-google-API-Token</p>
+                      <p className="text-muted-foreground">Your google API authentication token</p>
                     </div>
                   </div>
                 </div>
@@ -653,7 +653,7 @@ export default function DocsPage() {
                     { code: 400, type: 'missing_header', desc: 'Required API token header is missing' },
                     { code: 400, type: 'invalid_system_prompt', desc: 'System prompt provided in both root and messages' },
                     { code: 502, type: 'deepseek_error', desc: 'Error from DeepSeek API' },
-                    { code: 502, type: 'anthropic_error', desc: 'Error from Anthropic API' },
+                    { code: 502, type: 'google_error', desc: 'Error from google API' },
                     { code: 500, type: 'internal_error', desc: 'Internal server error' }
                   ].map((error, i) => (
                     <div key={i} className="p-4 rounded-lg bg-muted/30">

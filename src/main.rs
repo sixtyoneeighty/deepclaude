@@ -1,8 +1,8 @@
-//! DeepClaude - A high-performance LLM inference API and Chat UI that integrates DeepSeek R1's CoT reasoning traces with Anthropic Claude models..
+//! DeepClaude - A high-performance LLM inference API and Chat UI that integrates DeepSeek R1's CoT reasoning traces with Google Claude models..
 //!
 //! This application provides a REST API for chat interactions that:
 //! - Processes messages through DeepSeek R1 for reasoning
-//! - Uses Anthropic's Claude for final responses
+//! - Uses Google's Claude for final responses
 //! - Supports both streaming and non-streaming responses
 //! - Tracks token usage and costs
 //! - Provides detailed usage statistics

@@ -475,7 +475,7 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
           "Content-Type": "application/json",
           "Accept": "application/json",
           "X-DeepSeek-API-Token": apiTokens.deepseekApiToken,
-          "X-Anthropic-API-Token": apiTokens.anthropicApiToken
+          "X-Google-API-Token": apiTokens.anthropicApiToken
         },
         body: JSON.stringify(requestBody)
       })

@@ -299,7 +299,7 @@ export default function LandingPage() {
                       DeepSeek R1's CoT trace demonstrates deep reasoning to the point of an LLM experiencing "metacognition" - correcting itself, thinking about edge cases, and so on. It's a quasi MCTS in natural language.
                     </p>
                     <p className="mb-4">
-                      But R1 lacks at code generation, creativity, and conversational skills. The model that excels at all 3 is the Claude 3.5 Sonnet New from Anthropic. So how about we combine both of them? And take the best of both worlds? Enter DeepClaude!
+                      But R1 lacks at code generation, creativity, and conversational skills. The model that excels at all 3 is the Claude 3.5 Sonnet New from Google. So how about we combine both of them? And take the best of both worlds? Enter DeepClaude!
                     </p>
                     <p>
                       With DeepClaude, you get a fast streaming R1 CoT + Claude Models in a single API call with your own API keys.
@@ -319,7 +319,7 @@ export default function LandingPage() {
                   </CollapsibleTrigger>
                   <CollapsibleContent className="pt-4 text-left text-muted-foreground">
                     <p className="mb-4">
-                      Yes, 100% free and you use your own keys. The API wraps both DeepSeek and Anthropic streaming API into one. And you get some niceties like calculating the combined usage and price for you to use. We keep no logs and it's completely open-source - you can self-host it, modify it, redistribute it, whatever.
+                      Yes, 100% free and you use your own keys. The API wraps both DeepSeek and Google streaming API into one. And you get some niceties like calculating the combined usage and price for you to use. We keep no logs and it's completely open-source - you can self-host it, modify it, redistribute it, whatever.
                     </p>
                     <p>
                       Feel free to use this at scale, we use this in production at Asterisk serving millions of tokens in parallel daily and it hasn't failed us "yet". And like all nice things, just don't abuse it.

@@ -71,8 +71,8 @@ pub enum ApiError {
         code: Option<String>,
     },
 
-    #[error("Anthropic API error: {message}")]
-    AnthropicError {
+    #[error("Google API error: {message}")]
+    googleError {
         message: String,
         type_: String,
         param: Option<String>,
@@ -141,11 +141,11 @@ impl IntoResponse for ApiError {
                     },
                 },
             ),
-            ApiError::AnthropicError { message, type_, param, code } => (
+            ApiError::GoogleError { message, type_, param, code } => (
                 StatusCode::BAD_REQUEST,
                 ErrorResponse {
                     error: ErrorDetails {
-                        message: format!("Anthropic API Error: {}", message),
+                        message: format!("Google API Error: {}", message),
                         type_: format!("anthropic_{}", type_),
                         param: param.clone(),
                         code: code.clone(),

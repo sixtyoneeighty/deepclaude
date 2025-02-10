@@ -1,7 +1,8 @@
 //! Client implementations for external AI model providers.
 //!
 //! This module contains client implementations for different AI model providers:
-//! - `anthropic`: Client for Anthropic's Claude models
+//! - `anthropic`: Client for Google's Claude models
+//! - `gemini`: Client for Google's Gemini models
 //! - `deepseek`: Client for DeepSeek's reasoning models
 //!
 //! Each client handles authentication, request building, and response parsing
@@ -9,9 +10,11 @@
 
 pub mod anthropic;
 pub mod deepseek;
+pub mod gemini;
 
-pub use anthropic::AnthropicClient;
+pub use anthropic::GoogleClient;
 pub use deepseek::DeepSeekClient;
+pub use gemini::GeminiClient;
 
 use crate::error::Result;
 use reqwest::header::{HeaderMap, HeaderName, HeaderValue};

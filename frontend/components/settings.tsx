@@ -269,11 +269,11 @@ export function Settings({ onSettingsChange }: SettingsProps) {
                 name="anthropicApiToken"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Anthropic API Token</FormLabel>
+                    <FormLabel>Google API Token</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="Enter Anthropic API token..."
+                        placeholder="Enter Google API token..."
                         {...field}
                       />
                     </FormControl>
@@ -307,7 +307,7 @@ export function Settings({ onSettingsChange }: SettingsProps) {
               </div>
 
               <div className="space-y-4">
-                <h4 className="text-sm font-medium">Anthropic Configuration</h4>
+                <h4 className="text-sm font-medium">Google Configuration</h4>
                 <KeyValuePairFields name="anthropicHeaders" label="Headers" />
                 <KeyValuePairFields name="anthropicBody" label="Body" />
               </div>

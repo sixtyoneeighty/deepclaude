@@ -6,11 +6,11 @@
 //! usage tracking and cost calculations.
 
 use crate::{
-    clients::{AnthropicClient, DeepSeekClient},
+    clients::{GoogleClient, DeepSeekClient},
     config::Config,
     error::{ApiError, Result, SseResponse},
     models::{
-        ApiRequest, ApiResponse, ContentBlock, CombinedUsage, DeepSeekUsage, AnthropicUsage,
+        ApiRequest, ApiResponse, ContentBlock, CombinedUsage, DeepSeekUsage, GoogleUsage,
         ExternalApiResponse, Message, Role, StreamEvent,
     },
 };
@@ -40,7 +40,7 @@ pub struct AppState {
 ///
 /// # Returns
 ///
-/// * `Result<(String, String)>` - A tuple of (DeepSeek token, Anthropic token)
+/// * `Result<(String, String)>` - A tuple of (DeepSeek token, Gemini token)
 ///
 /// # Errors
 ///
@@ -60,18 +60,18 @@ fn extract_api_tokens(
         })?
         .to_string();
 
-    let anthropic_token = headers
-        .get("X-Anthropic-API-Token")
+    let gemini_token = headers
+        .get("X-Gemini-API-Token")
         .ok_or_else(|| ApiError::MissingHeader { 
-            header: "X-Anthropic-API-Token".to_string() 
+            header: "X-Gemini-API-Token".to_string() 
         })?
         .to_str()
         .map_err(|_| ApiError::BadRequest { 
-            message: "Invalid Anthropic API token".to_string() 
+            message: "Invalid Gemini API token".to_string() 
         })?
         .to_string();
 
-    Ok((deepseek_token, anthropic_token))
+    Ok((deepseek_token, gemini_token))
 }
 
 /// Calculates the cost of DeepSeek API usage.
@@ -101,44 +101,28 @@ fn calculate_deepseek_cost(
     cache_hit_cost + cache_miss_cost + output_cost
 }
 
-/// Calculates the cost of Anthropic API usage.
+/// Calculates the cost of Gemini API usage.
 ///
 /// # Arguments
 ///
-/// * `model` - The specific Claude model used
 /// * `input_tokens` - Number of input tokens processed
 /// * `output_tokens` - Number of output tokens generated
-/// * `cache_write_tokens` - Number of tokens written to cache
-/// * `cache_read_tokens` - Number of tokens read from cache
 /// * `config` - Configuration containing pricing information
 ///
 /// # Returns
 ///
 /// The total cost in dollars for the API usage
-fn calculate_anthropic_cost(
-    model: &str,
+fn calculate_gemini_cost(
     input_tokens: u32,
     output_tokens: u32,
-    cache_write_tokens: u32,
-    cache_read_tokens: u32,
     config: &Config,
 ) -> f64 {
-    let pricing = if model.contains("claude-3-5-sonnet") {
-        &config.pricing.anthropic.claude_3_sonnet
-    } else if model.contains("claude-3-5-haiku") {
-        &config.pricing.anthropic.claude_3_haiku
-    } else if model.contains("claude-3-opus") {
-        &config.pricing.anthropic.claude_3_opus
-    } else {
-        &config.pricing.anthropic.claude_3_sonnet // default to sonnet pricing
-    };
+    let pricing = &config.pricing.gemini.gemini_pro;
 
     let input_cost = (input_tokens as f64 / 1_000_000.0) * pricing.input_price;
     let output_cost = (output_tokens as f64 / 1_000_000.0) * pricing.output_price;
-    let cache_write_cost = (cache_write_tokens as f64 / 1_000_000.0) * pricing.cache_write_price;
-    let cache_read_cost = (cache_read_tokens as f64 / 1_000_000.0) * pricing.cache_read_price;
 
-    input_cost + output_cost + cache_write_cost + cache_read_cost
+    input_cost + output_cost
 }
 
 /// Formats a cost value as a dollar amount string.
@@ -211,7 +195,7 @@ pub(crate) async fn chat(
 
     // Initialize clients
     let deepseek_client = DeepSeekClient::new(deepseek_token);
-    let anthropic_client = AnthropicClient::new(anthropic_token);
+    let anthropic_client = GoogleClient::new(anthropic_token);
 
     // Get messages with system prompt
     let messages = request.get_messages_with_system();
@@ -237,23 +221,23 @@ pub(crate) async fn chat(
 
     let thinking_content = format!("<thinking>\n{}\n</thinking>", reasoning_content);
 
-    // Add thinking content to messages for Anthropic
-    let mut anthropic_messages = messages;
-    anthropic_messages.push(Message {
+    // Add thinking content to messages for Gemini
+    let mut gemini_messages = messages;
+    gemini_messages.push(Message {
         role: Role::Assistant,
         content: thinking_content.clone(),
     });
 
-    // Call Anthropic API
-    let anthropic_response = anthropic_client.chat(
-        anthropic_messages,
+    // Call Gemini API
+    let gemini_response = gemini_client.chat(
+        gemini_messages,
         request.get_system_prompt().map(String::from),
-        &request.anthropic_config
+        &request.gemini_config
     ).await?;
     
     // Store response metadata
-    let anthropic_status: u16 = 200;
-    let anthropic_headers = HashMap::new(); // Headers not available when using high-level chat method
+    let gemini_status: u16 = 200;
+    let gemini_headers = HashMap::new(); // Headers not available when using high-level chat method
 
     // Calculate usage costs
     let deepseek_cost = calculate_deepseek_cost(
@@ -264,24 +248,21 @@ pub(crate) async fn chat(
         &state.config,
     );
 
-    let anthropic_cost = calculate_anthropic_cost(
-        &anthropic_response.model,
-        anthropic_response.usage.input_tokens,
-        anthropic_response.usage.output_tokens,
-        anthropic_response.usage.cache_creation_input_tokens,
-        anthropic_response.usage.cache_read_input_tokens,
+    let gemini_cost = calculate_gemini_cost(
+        gemini_response.usage.as_ref().map(|u| u.prompt_tokens).unwrap_or(0),
+        gemini_response.usage.as_ref().map(|u| u.completion_tokens).unwrap_or(0),
         &state.config,
     );
 
-    // Combine thinking content with Anthropic's response
+    // Combine thinking content with Gemini's response
     let mut content = Vec::new();
     
     // Add thinking block first
     content.push(ContentBlock::text(thinking_content));
     
-    // Add Anthropic's response blocks
-    content.extend(anthropic_response.content.clone().into_iter()
-        .map(ContentBlock::from_anthropic));
+    // Add Gemini's response blocks
+    content.extend(gemini_response.content.clone().into_iter()
+        .map(ContentBlock::from_gemini));
 
     // Build response with captured headers
     let response = ApiResponse {
@@ -292,10 +273,10 @@ pub(crate) async fn chat(
             headers: deepseek_headers,
             body: serde_json::to_value(&deepseek_response).unwrap_or_default(),
         }),
-        anthropic_response: request.verbose.then(|| ExternalApiResponse {
-            status: anthropic_status,
-            headers: anthropic_headers,
-            body: serde_json::to_value(&anthropic_response).unwrap_or_default(),
+        gemini_response: request.verbose.then(|| ExternalApiResponse {
+            status: gemini_status,
+            headers: gemini_headers,
+            body: serde_json::to_value(&gemini_response).unwrap_or_default(),
         }),
         combined_usage: CombinedUsage {
             total_cost: format_cost(deepseek_cost + anthropic_cost),
@@ -307,13 +288,11 @@ pub(crate) async fn chat(
                 total_tokens: deepseek_response.usage.total_tokens,
                 total_cost: format_cost(deepseek_cost),
             },
-            anthropic_usage: AnthropicUsage {
-                input_tokens: anthropic_response.usage.input_tokens,
-                output_tokens: anthropic_response.usage.output_tokens,
-                cached_write_tokens: anthropic_response.usage.cache_creation_input_tokens,
-                cached_read_tokens: anthropic_response.usage.cache_read_input_tokens,
-                total_tokens: anthropic_response.usage.input_tokens + anthropic_response.usage.output_tokens,
-                total_cost: format_cost(anthropic_cost),
+            gemini_usage: GeminiUsage {
+                input_tokens: gemini_response.usage.as_ref().map(|u| u.prompt_tokens).unwrap_or(0),
+                output_tokens: gemini_response.usage.as_ref().map(|u| u.completion_tokens).unwrap_or(0),
+                total_tokens: gemini_response.usage.as_ref().map(|u| u.total_tokens).unwrap_or(0),
+                total_cost: format_cost(gemini_cost),
             },
         },
     };
@@ -346,11 +325,11 @@ pub(crate) async fn chat_stream(
     }
 
     // Extract API tokens
-    let (deepseek_token, anthropic_token) = extract_api_tokens(&headers)?;
+    let (deepseek_token, gemini_token) = extract_api_tokens(&headers)?;
 
     // Initialize clients
     let deepseek_client = DeepSeekClient::new(deepseek_token);
-    let anthropic_client = AnthropicClient::new(anthropic_token);
+    let gemini_client = GeminiClient::new(gemini_token);
 
     // Get messages with system prompt
     let messages = request.get_messages_with_system();
@@ -457,31 +436,31 @@ pub(crate) async fn chat_stream(
             )))
             .await;
 
-        // Add complete thinking content to messages for Anthropic
-        let mut anthropic_messages = messages;
-        anthropic_messages.push(Message {
+        // Add complete thinking content to messages for Gemini
+        let mut gemini_messages = messages;
+        gemini_messages.push(Message {
             role: Role::Assistant,
             content: format!("<thinking>\n{}\n</thinking>", complete_reasoning),
         });
 
-        // Stream from Anthropic
-        let mut anthropic_stream = anthropic_client.chat_stream(
-            anthropic_messages,
+        // Stream from Gemini
+        let mut gemini_stream = gemini_client.chat_stream(
+            gemini_messages,
             request_clone.get_system_prompt().map(String::from),
-            &request_clone.anthropic_config,
+            &request_clone.gemini_config,
         );
 
-        while let Some(chunk) = anthropic_stream.next().await {
+        while let Some(chunk) = gemini_stream.next().await {
             match chunk {
                 Ok(event) => match event {
-                    crate::clients::anthropic::StreamEvent::MessageStart { message } => {
+                    crate::clients::gemini::StreamEvent::MessageStart { message } => {
                         // Only send content event if there's actual content to send
                         if !message.content.is_empty() {
                             let _ = tx
                                 .send(Ok(Event::default().event("content").data(
                                     serde_json::to_string(&StreamEvent::Content { 
                                         content: message.content.into_iter()
-                                            .map(ContentBlock::from_anthropic)
+                                            .map(ContentBlock::from_gemini)
                                             .collect()
                                     })
                                     .unwrap_or_default(),
@@ -489,7 +468,7 @@ pub(crate) async fn chat_stream(
                                 .await;
                         }
                     }
-                    crate::clients::anthropic::StreamEvent::ContentBlockDelta { delta, .. } => {
+                    crate::clients::gemini::StreamEvent::ContentBlockDelta { delta, .. } => {
                         // Send content update
                         let _ = tx
                             .send(Ok(Event::default().event("content").data(
@@ -503,16 +482,13 @@ pub(crate) async fn chat_stream(
                             )))
                             .await;
                     }
-                    crate::clients::anthropic::StreamEvent::MessageDelta { usage, .. } => {
+                    crate::clients::gemini::StreamEvent::MessageDelta { usage, .. } => {
                         // Send final usage stats if available
                         if let Some(usage) = usage {
-                            let anthropic_usage = AnthropicUsage::from_anthropic(usage);
-                            let anthropic_cost = calculate_anthropic_cost(
-                                "claude-3-5-sonnet-20241022", // Default model
-                                anthropic_usage.input_tokens,
-                                anthropic_usage.output_tokens,
-                                anthropic_usage.cached_write_tokens,
-                                anthropic_usage.cached_read_tokens,
+                            let gemini_usage = GeminiUsage::from_gemini(&usage);
+                            let gemini_cost = calculate_gemini_cost(
+                                gemini_usage.input_tokens,
+                                gemini_usage.output_tokens,
                                 &config,
                             );
 
@@ -549,15 +525,13 @@ pub(crate) async fn chat_stream(
                                 .send(Ok(Event::default().event("usage").data(
                                     serde_json::to_string(&StreamEvent::Usage {
                                         usage: CombinedUsage {
-                                            total_cost: format_cost(deepseek_cost + anthropic_cost),
+                                            total_cost: format_cost(deepseek_cost + gemini_cost),
                                             deepseek_usage,
-                                            anthropic_usage: AnthropicUsage {
-                                                input_tokens: anthropic_usage.input_tokens,
-                                                output_tokens: anthropic_usage.output_tokens,
-                                                cached_write_tokens: anthropic_usage.cached_write_tokens,
-                                                cached_read_tokens: anthropic_usage.cached_read_tokens,
-                                                total_tokens: anthropic_usage.total_tokens,
-                                                total_cost: format_cost(anthropic_cost),
+                                            gemini_usage: GeminiUsage {
+                                                input_tokens: gemini_usage.input_tokens,
+                                                output_tokens: gemini_usage.output_tokens,
+                                                total_tokens: gemini_usage.total_tokens,
+                                                total_cost: format_cost(gemini_cost),
                                             },
                                         },
                                     })
