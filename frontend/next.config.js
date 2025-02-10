@@ -5,14 +5,8 @@ const nextConfig = {
   experimental: {
     serverActions: true,
   },
-  async rewrites() {
-    return [
-      {
-        source: '/:path*',
-        destination: '/:path*',
-      },
-    ]
-  },
+  distDir: '.next',
+  poweredByHeader: false,
 }
 
 module.exports = nextConfig

@@ -9,5 +9,6 @@
   },
   "rewrites": [
     { "source": "/(.*)", "destination": "/frontend/$1" }
-  ]
+  ],
+  "rootDirectory": "frontend"
 }
