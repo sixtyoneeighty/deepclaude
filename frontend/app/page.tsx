@@ -2,14 +2,14 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { usePostHog } from "../providers/posthog"
+
 import { Button } from "../components/ui/button"
 import { Card } from "../components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../components/ui/collapsible"
 import { ArrowRight, Zap, Lock, Settings2, Code2, Sparkles, Github, Megaphone, ChevronDown } from "lucide-react"
 
 export default function LandingPage() {
-  const posthog = usePostHog()
+
   return (
     <div className="min-h-screen flex flex-col">
       {/* Hero Section */}
@@ -77,25 +77,13 @@ export default function LandingPage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/chat" onClick={() => {
-              posthog.capture('cta_click', {
-                location: 'hero',
-                target: 'chat',
-                timestamp: new Date().toISOString()
-              })
-            }}>
+            <Link href="/chat">
               <Button size="lg" className="group">
                 Try DeepClaude Chat
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Button>
             </Link>
-            <Link href="/docs" onClick={() => {
-              posthog.capture('cta_click', {
-                location: 'hero',
-                target: 'docs',
-                timestamp: new Date().toISOString()
-              })
-            }}>
+            <Link href="/docs">
               <Button variant="outline" size="lg" className="group">
                 <Code2 className="mr-2 h-4 w-4" />
                 API Docs
@@ -105,13 +93,7 @@ export default function LandingPage() {
               href="https://github.com/getasterisk/deepclaude" 
               target="_blank" 
               rel="noopener noreferrer"
-              onClick={() => {
-                posthog.capture('cta_click', {
-                  location: 'hero',
-                  target: 'github',
-                  timestamp: new Date().toISOString()
-                })
-              }}
+
             >
               <Button variant="outline" size="lg" className="group">
                 <Github className="mr-2 h-4 w-4" />
@@ -168,12 +150,7 @@ export default function LandingPage() {
               {/* Performance */}
               <Card 
                 className="p-6 bg-card/50 backdrop-blur border-muted hover:border-primary/50 transition-colors"
-                onClick={() => {
-                  posthog.capture('feature_view', {
-                    feature: 'zero_latency',
-                    timestamp: new Date().toISOString()
-                  })
-                }}
+
               >
                 <div className="space-y-4">
                   <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -282,12 +259,7 @@ export default function LandingPage() {
               <Collapsible>
                 <CollapsibleTrigger 
                   className="w-full"
-                  onClick={() => {
-                    posthog.capture('faq_interaction', {
-                      question: 'why_r1_claude',
-                      timestamp: new Date().toISOString()
-                    })
-                  }}
+
                 >
                   <div className="flex items-center justify-between text-left">
                     <h3 className="text-xl font-semibold">Why R1 + Claude?</h3>
@@ -346,25 +318,13 @@ export default function LandingPage() {
               No sign up. No credit card. No data stored.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/chat" onClick={() => {
-                posthog.capture('cta_click', {
-                  location: 'footer',
-                  target: 'chat',
-                  timestamp: new Date().toISOString()
-                })
-              }}>
+              <Link href="/chat">
                 <Button size="lg" className="group">
                   Try DeepClaude Chat
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
-              <Link href="/docs" onClick={() => {
-                posthog.capture('cta_click', {
-                  location: 'footer',
-                  target: 'docs',
-                  timestamp: new Date().toISOString()
-                })
-              }}>
+              <Link href="/docs">
                 <Button variant="outline" size="lg" className="group">
                   <Code2 className="mr-2 h-4 w-4" />
                   API Docs
