@@ -17,15 +17,15 @@ interface SettingsFormValues {
   model: string
   systemPrompt: string
   deepseekApiToken: string
-  anthropicApiToken: string
+  googleApiToken: string
   deepseekHeaders: { key: string; value: string }[]
   deepseekBody: { key: string; value: string }[]
-  anthropicHeaders: { key: string; value: string }[]
-  anthropicBody: { key: string; value: string }[]
+  googleHeaders: { key: string; value: string }[]
+  googleBody: { key: string; value: string }[]
 }
 
 interface SettingsProps {
-  onSettingsChange: (settings: { deepseekApiToken: string; anthropicApiToken: string }) => void
+  onSettingsChange: (settings: { deepseekApiToken: string; googleApiToken: string }) => void
 }
 
 export function Settings({ onSettingsChange }: SettingsProps) {
@@ -37,11 +37,11 @@ export function Settings({ onSettingsChange }: SettingsProps) {
     defaultValues: {
       systemPrompt: "You are a helpful AI assistant who excels at reasoning and responds in Markdown format. For code snippets, you wrap them in Markdown codeblocks with it's language specified.",
       deepseekApiToken: "",
-      anthropicApiToken: "",
+      googleApiToken: "",
       deepseekHeaders: [],
       deepseekBody: [],
-      anthropicHeaders: [{ key: "anthropic-version", value: "2023-06-01" }],
-      anthropicBody: []
+      googleHeaders: [{ key: "x-goog-api-key", value: "" }],
+      googleBody: []
     }
   })
 
@@ -53,7 +53,7 @@ export function Settings({ onSettingsChange }: SettingsProps) {
       form.reset(settings)
       onSettingsChange({
         deepseekApiToken: settings.deepseekApiToken,
-        anthropicApiToken: settings.anthropicApiToken
+        googleApiToken: settings.googleApiToken
       })
     }
   }, [form, onSettingsChange])
@@ -63,19 +63,19 @@ export function Settings({ onSettingsChange }: SettingsProps) {
     localStorage.setItem('deepclaude-settings', JSON.stringify(data))
     onSettingsChange({
       deepseekApiToken: data.deepseekApiToken,
-      anthropicApiToken: data.anthropicApiToken
+      googleApiToken: data.googleApiToken
     })
 
     // Track settings update
     posthog.capture('settings_updated', {
       model: data.model,
       has_deepseek_token: !!data.deepseekApiToken,
-      has_anthropic_token: !!data.anthropicApiToken,
+      has_google_token: !!data.googleApiToken,
       has_system_prompt: !!data.systemPrompt,
       deepseek_headers_count: data.deepseekHeaders.length,
       deepseek_body_count: data.deepseekBody.length,
-      anthropic_headers_count: data.anthropicHeaders.length,
-      anthropic_body_count: data.anthropicBody.length,
+      google_headers_count: data.googleHeaders.length,
+      google_body_count: data.googleBody.length,
       timestamp: new Date().toISOString()
     })
 
@@ -107,16 +107,16 @@ export function Settings({ onSettingsChange }: SettingsProps) {
     form.reset({
       systemPrompt: "You are a helpful AI assistant who excels at reasoning and responds in Markdown format. For code snippets, you wrap them in Markdown codeblocks with it's language specified.",
       deepseekApiToken: "",
-      anthropicApiToken: "",
+      googleApiToken: "",
       deepseekHeaders: [],
       deepseekBody: [],
-      anthropicHeaders: [{ key: "anthropic-version", value: "2023-06-01" }],
-      anthropicBody: []
+      googleHeaders: [{ key: "x-goog-api-key", value: "" }],
+      googleBody: []
     })
     localStorage.removeItem('deepclaude-settings')
     onSettingsChange({
       deepseekApiToken: "",
-      anthropicApiToken: ""
+      googleApiToken: ""
     })
 
     // Track settings reset
@@ -134,7 +134,7 @@ export function Settings({ onSettingsChange }: SettingsProps) {
     name,
     label 
   }: { 
-    name: "deepseekHeaders" | "deepseekBody" | "anthropicHeaders" | "anthropicBody"
+    name: "deepseekHeaders" | "deepseekBody" | "googleHeaders" | "googleBody"
     label: string 
   }) => {
     const pairs = form.watch(name)
@@ -197,7 +197,7 @@ export function Settings({ onSettingsChange }: SettingsProps) {
             <Settings2 className="h-4 w-4" />
             Configure
           </Button>
-          {!form.getValues("deepseekApiToken") || !form.getValues("anthropicApiToken") ? (
+          {!form.getValues("deepseekApiToken") || !form.getValues("googleApiToken") ? (
             <div className="absolute top-[48px] right-0 bg-muted text-muted-foreground px-4 py-2 rounded-lg text-sm border border-border before:content-[''] before:absolute before:top-[-6px] before:right-6 before:w-3 before:h-3 before:bg-muted before:border-l before:border-t before:border-border before:rotate-45">
               Configure API tokens to start
             </div>
@@ -227,7 +227,7 @@ export function Settings({ onSettingsChange }: SettingsProps) {
                   localStorage.setItem('deepclaude-settings', JSON.stringify(data))
                   onSettingsChange({
                     deepseekApiToken: data.deepseekApiToken,
-                    anthropicApiToken: data.anthropicApiToken
+                    googleApiToken: data.googleApiToken
                   })
                   toast({
                     variant: "success",
@@ -266,7 +266,7 @@ export function Settings({ onSettingsChange }: SettingsProps) {
 
               <FormField
                 control={form.control}
-                name="anthropicApiToken"
+                name="googleApiToken"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Google API Token</FormLabel>
@@ -308,8 +308,8 @@ export function Settings({ onSettingsChange }: SettingsProps) {
 
               <div className="space-y-4">
                 <h4 className="text-sm font-medium">Google Configuration</h4>
-                <KeyValuePairFields name="anthropicHeaders" label="Headers" />
-                <KeyValuePairFields name="anthropicBody" label="Body" />
+                <KeyValuePairFields name="googleHeaders" label="Headers" />
+                <KeyValuePairFields name="googleBody" label="Body" />
               </div>
             </div>
 

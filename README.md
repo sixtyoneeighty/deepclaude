@@ -22,7 +22,7 @@ Harness the power of DeepSeek R1's reasoning and Claude's creativity and code ge
 ## Table of Contents
 - [Overview](#overview)
 - [Features](#features)
-- [Why R1 + Claude?](#why-r1--claude)
+- [Why R1 + ?](#why-r1--)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)

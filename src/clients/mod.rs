@@ -8,11 +8,10 @@
 //! Each client handles authentication, request building, and response parsing
 //! specific to its provider's API.
 
-pub mod anthropic;
+
 pub mod deepseek;
 pub mod gemini;
 
-pub use anthropic::GoogleClient;
 pub use deepseek::DeepSeekClient;
 pub use gemini::GeminiClient;
 

@@ -39,7 +39,7 @@ interface ChatProps {
   onModelChange: (model: string) => void
   apiTokens: {
     deepseekApiToken: string
-    anthropicApiToken: string
+    googleApiToken: string
   }
 }
 
@@ -407,7 +407,7 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
 
   const handleSubmit = async () => {
     if (!input.trim() || isLoading) return
-    if (!apiTokens.deepseekApiToken || !apiTokens.anthropicApiToken) return
+    if (!apiTokens.deepseekApiToken || !apiTokens.googleApiToken) return
 
     // Track message sent
     posthog.capture('message_sent', {
@@ -459,8 +459,8 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
           headers: {},
           body: { temperature: 0 }
         },
-        anthropic_config: {
-          headers: { "anthropic-version": "2023-06-01" },
+        gemini_config: {
+          headers: { "x-goog-api-key": apiTokens.googleApiToken },
           body: {
             temperature: 0,
             model: selectedModel
@@ -475,7 +475,7 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
           "Content-Type": "application/json",
           "Accept": "application/json",
           "X-DeepSeek-API-Token": apiTokens.deepseekApiToken,
-          "X-Google-API-Token": apiTokens.anthropicApiToken
+          "X-Google-API-Token": apiTokens.googleApiToken
         },
         body: JSON.stringify(requestBody)
       })
@@ -598,7 +598,7 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
     }
   }
 
-  const hasApiTokens = apiTokens.deepseekApiToken && apiTokens.anthropicApiToken
+  const hasApiTokens = apiTokens.deepseekApiToken && apiTokens.googleApiToken
 
   return (
     <div className="flex min-h-screen">
@@ -810,13 +810,9 @@ export function Chat({ selectedModel, onModelChange, apiTokens }: ChatProps) {
                 </SelectTrigger>
                 <SelectContent>
                   {[
-                    "claude-3-5-sonnet-20241022",
-                    "claude-3-5-sonnet-latest",
-                    "claude-3-5-haiku-20241022",
-                    "claude-3-5-haiku-latest",
-                    "claude-3-opus-20240229",
-                    "claude-3-opus-latest"
-                  ].map((model) => (
+                    "gemini-2.0-pro-exp",
+                    "gemini-2.0-flash-exp",
+                   ].map((model) => (
                     <SelectItem key={model} value={model}>
                       {model}
                     </SelectItem>

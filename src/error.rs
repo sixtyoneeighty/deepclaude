@@ -146,7 +146,7 @@ impl IntoResponse for ApiError {
                 ErrorResponse {
                     error: ErrorDetails {
                         message: format!("Google API Error: {}", message),
-                        type_: format!("anthropic_{}", type_),
+                        type_: format!("Google_{}", type_),
                         param: param.clone(),
                         code: code.clone(),
                     },

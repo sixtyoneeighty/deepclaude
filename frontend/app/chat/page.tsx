@@ -5,10 +5,10 @@ import { Chat } from "../../components/chat"
 import { Settings } from "../../components/settings"
 
 export default function ChatPage() {
-  const [selectedModel, setSelectedModel] = useState("claude-3-5-sonnet-20241022")
+  const [selectedModel, setSelectedModel] = useState("gemini-2.0-pro-exp")
   const [apiTokens, setApiTokens] = useState({
     deepseekApiToken: "",
-    anthropicApiToken: ""
+    googleApiToken: ""
   })
 
   return (

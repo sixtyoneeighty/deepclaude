@@ -17,7 +17,7 @@ output_price = 15.0
 cache_write_price = 3.75
 cache_read_price = 0.30
 
-[pricing.anthropic.claude_3_haiku]
+[pricing.Google.claude_3_haiku]
 input_price = 0.80
 output_price = 4.0
 cache_write_price = 1.0

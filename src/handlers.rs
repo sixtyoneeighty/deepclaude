@@ -6,11 +6,11 @@
 //! usage tracking and cost calculations.
 
 use crate::{
-    clients::{GoogleClient, DeepSeekClient},
+    clients::{AnthropicClient, DeepSeekClient},
     config::Config,
     error::{ApiError, Result, SseResponse},
     models::{
-        ApiRequest, ApiResponse, ContentBlock, CombinedUsage, DeepSeekUsage, GoogleUsage,
+        ApiRequest, ApiResponse, ContentBlock, CombinedUsage, DeepSeekUsage, AnthropicUsage,
         ExternalApiResponse, Message, Role, StreamEvent,
     },
 };
@@ -195,7 +195,7 @@ pub(crate) async fn chat(
 
     // Initialize clients
     let deepseek_client = DeepSeekClient::new(deepseek_token);
-    let anthropic_client = GoogleClient::new(anthropic_token);
+    let google_client =Googlkelient::new(google_token);
 
     // Get messages with system prompt
     let messages = request.get_messages_with_system();
